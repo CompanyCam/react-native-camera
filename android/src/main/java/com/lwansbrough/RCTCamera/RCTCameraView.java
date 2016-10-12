@@ -4,8 +4,12 @@
 
 package com.lwansbrough.RCTCamera;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.SensorManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.OrientationEventListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -42,6 +46,10 @@ public class RCTCameraView extends ViewGroup {
         } else {
             _orientationListener.disable();
         }
+        
+        // Register to receive broadcasts from the MainActivity about when to enable or disable the orientation listener
+        LocalBroadcastManager.getInstance(_context).registerReceiver(broadcastReceiver, new IntentFilter("MainActivityPaused"));
+        LocalBroadcastManager.getInstance(_context).registerReceiver(broadcastReceiver, new IntentFilter("MainActivityResumed"));
     }
 
     @Override
@@ -175,4 +183,26 @@ public class RCTCameraView extends ViewGroup {
         this._viewFinder.layout(viewFinderPaddingX, viewFinderPaddingY, viewFinderPaddingX + viewfinderWidth, viewFinderPaddingY + viewfinderHeight);
         this.postInvalidate(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
     }
+    
+    // This object responds to broadcasts from the MainActivity
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals("MainActivityResumed")) {
+
+                // Enable the orientation listener
+                if (_orientationListener != null) {
+                    _orientationListener.enable();
+                }
+            }
+            else if (intent.getAction().equals("MainActivityPaused")) {
+
+                // Disable the orientation listener
+                if (_orientationListener != null) {
+                    _orientationListener.disable();
+                }
+            }
+        }
+    };
 }
