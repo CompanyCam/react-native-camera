@@ -191,12 +191,28 @@ public class RCTCameraView extends ViewGroup {
 
             if (intent.getAction().equals("MainActivityResumed")) {
 
+                System.out.println("RCTCameraView received MainActivityResumed broadcast");
+
+                // Acquire the rear camera
+                RCTCamera.getInstance().acquireCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
+
+                // Start the preview
+                _viewFinder.startPreview();
+
                 // Enable the orientation listener
                 if (_orientationListener != null) {
                     _orientationListener.enable();
                 }
             }
             else if (intent.getAction().equals("MainActivityPaused")) {
+
+                System.out.println("RCTCameraView received MainActivityPaused broadcast");
+
+                // Stop the preview
+                _viewFinder.stopPreview();
+
+                // Release the back camera
+                RCTCamera.getInstance().releaseCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
 
                 // Disable the orientation listener
                 if (_orientationListener != null) {

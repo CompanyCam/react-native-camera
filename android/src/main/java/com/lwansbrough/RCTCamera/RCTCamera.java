@@ -28,6 +28,7 @@ public class RCTCamera {
         return ourInstance;
     }
     public static void createInstance(int deviceOrientation) {
+        System.out.println("RCTCamera createInstance called");
         ourInstance = new RCTCamera(deviceOrientation);
     }
 
@@ -35,6 +36,7 @@ public class RCTCamera {
     public Camera acquireCameraInstance(int type) {
         if (null == _cameras.get(type) && null != _cameraTypeToIndex.get(type)) {
             try {
+                System.out.println("RCTCamera Trying to actually acquire a camera");
                 Camera camera = Camera.open(_cameraTypeToIndex.get(type));
                 _cameras.put(type, camera);
                 adjustPreviewLayout(type);
@@ -49,6 +51,7 @@ public class RCTCamera {
 
     public void releaseCameraInstance(int type) {
         if (null != _cameras.get(type)) {
+            System.out.println("RCTCamera releaseCameraInstance called");
             _cameras.get(type).release();
             _cameras.remove(type);
         }
