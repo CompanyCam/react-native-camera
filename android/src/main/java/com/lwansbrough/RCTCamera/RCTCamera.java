@@ -52,6 +52,7 @@ public class RCTCamera {
     public void releaseCameraInstance(int type) {
         if (null != _cameras.get(type)) {
             System.out.println("RCTCamera releaseCameraInstance called");
+            _cameras.get(type).setPreviewCallback(null);
             _cameras.get(type).release();
             _cameras.remove(type);
         }
