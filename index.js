@@ -202,6 +202,17 @@ export default class Camera extends Component {
     }
   };
 
+  forceRelease() {
+    var logstr = "[RCTCamera JS] Attempted to force Camera release: ";
+    if(CameraManager.forceRelease){
+      CameraManager.forceRelease();
+      logstr += "Success!";
+    }else{
+      logstr += "Failed, forceRelease is undefined";
+    }
+    console.log(logstr);
+  }
+
   capture(options) {
     const props = convertNativeProps(this.props);
     options = {

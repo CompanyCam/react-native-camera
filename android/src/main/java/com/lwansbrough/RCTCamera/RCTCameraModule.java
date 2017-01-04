@@ -461,6 +461,18 @@ public class RCTCameraModule extends ReactContextBaseJavaModule
             }
         }
     }
+    
+    @ReactMethod
+    public void forceRelease() {
+        System.out.println("[RCTCameraModule.java] Force release requested");
+        RCTCamera instance = RCTCamera.getInstance();
+        if(instance != null){
+            instance.releaseCameraInstance(RCT_CAMERA_TYPE_BACK);
+            System.out.println("[RCTCameraModule.java] Success!");
+        }else{
+            System.out.println("[RCTCameraModule.java] No RCTCamera instance; failed");
+        }
+    }
 
     @ReactMethod
     public void capture(final ReadableMap options, final Promise promise) {
