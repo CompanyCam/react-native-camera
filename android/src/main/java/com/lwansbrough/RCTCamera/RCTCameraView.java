@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View;
 
+import com.facebook.react.bridge.LifecycleEventListener;
+
 import java.util.List;
 
 public class RCTCameraView extends ViewGroup {
@@ -26,6 +28,11 @@ public class RCTCameraView extends ViewGroup {
     private String _captureQuality = "high";
     private int _torchMode = -1;
     private int _flashMode = -1;
+
+    private boolean shouldReacquireCamera = false;
+
+    // Each instance will create a lifecycleListener to properly release and reacquire the camera when the app transitions from background to foreground
+    public LifecycleEventListener lifecycleListener;
 
     public RCTCameraView(Context context) {
         super(context);
@@ -46,10 +53,77 @@ public class RCTCameraView extends ViewGroup {
         } else {
             _orientationListener.disable();
         }
-        
-        // Register to receive broadcasts from the MainActivity about when to enable or disable the orientation listener
-        LocalBroadcastManager.getInstance(_context).registerReceiver(broadcastReceiver, new IntentFilter("MainActivityPaused"));
-        LocalBroadcastManager.getInstance(_context).registerReceiver(broadcastReceiver, new IntentFilter("MainActivityResumed"));
+
+        lifecycleListener = new LifecycleEventListener() {
+            @Override
+            public void onHostResume() {
+                System.out.println("onHostResume called in RCTCameraView");
+
+                // Check if the view should try to reacquire the camera
+                if (shouldReacquireCamera) {
+
+                    // Acquire the rear camera
+                    RCTCamera.getInstance().acquireCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
+
+                    // Start the preview
+                    _viewFinder.startPreview();
+
+                    // Enable the orientation listener
+                    if (_orientationListener != null) {
+                        _orientationListener.enable();
+                    }
+
+                    // Reset the shouldReacquireCamera flag
+                    shouldReacquireCamera = false;
+                }
+            }
+
+            @Override
+            public void onHostPause() {
+                System.out.println("onHostPause called in RCTCameraView");
+
+                // Check if this view currently has a reference to the back camera
+                if (RCTCamera.getInstance().hasCameraInstanceOfType(RCTCameraModule.RCT_CAMERA_TYPE_BACK)) {
+
+                    // Stop the preview
+                    _viewFinder.stopPreview();
+
+                    // Release the back camera
+                    RCTCamera.getInstance().releaseCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
+
+                    // Disable the orientation listener
+                    if (_orientationListener != null) {
+                        _orientationListener.disable();
+                    }
+
+                    // Set the shouldReacquireCamera flag so that the view attempts to reacquire the camera after the activity resumes
+                    shouldReacquireCamera = true;
+                }
+            }
+
+            @Override
+            public void onHostDestroy() {
+                System.out.println("onHostDestroy called in RCTCameraView");
+
+                // Check if this view currently has a reference to the back camera
+                if (RCTCamera.getInstance().hasCameraInstanceOfType(RCTCameraModule.RCT_CAMERA_TYPE_BACK)) {
+
+                    // Stop the preview
+                    _viewFinder.stopPreview();
+
+                    // Release the back camera
+                    RCTCamera.getInstance().releaseCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
+
+                    // Disable the orientation listener
+                    if (_orientationListener != null) {
+                        _orientationListener.disable();
+                    }
+
+                    // Set the shouldReacquireCamera flag so that the view attempts to reacquire the camera after the activity resumes
+                    shouldReacquireCamera = true;
+                }
+            }
+        };
     }
 
     @Override
@@ -183,42 +257,4 @@ public class RCTCameraView extends ViewGroup {
         this._viewFinder.layout(viewFinderPaddingX, viewFinderPaddingY, viewFinderPaddingX + viewfinderWidth, viewFinderPaddingY + viewfinderHeight);
         this.postInvalidate(this.getLeft(), this.getTop(), this.getRight(), this.getBottom());
     }
-    
-    // This object responds to broadcasts from the MainActivity
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            if (intent.getAction().equals("MainActivityResumed")) {
-
-                System.out.println("RCTCameraView received MainActivityResumed broadcast");
-
-                // Acquire the rear camera
-                RCTCamera.getInstance().acquireCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
-
-                // Start the preview
-                _viewFinder.startPreview();
-
-                // Enable the orientation listener
-                if (_orientationListener != null) {
-                    _orientationListener.enable();
-                }
-            }
-            else if (intent.getAction().equals("MainActivityPaused")) {
-
-                System.out.println("RCTCameraView received MainActivityPaused broadcast");
-
-                // Stop the preview
-                _viewFinder.stopPreview();
-
-                // Release the back camera
-                RCTCamera.getInstance().releaseCameraInstance(RCTCameraModule.RCT_CAMERA_TYPE_BACK);
-
-                // Disable the orientation listener
-                if (_orientationListener != null) {
-                    _orientationListener.disable();
-                }
-            }
-        }
-    };
 }

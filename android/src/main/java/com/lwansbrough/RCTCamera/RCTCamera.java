@@ -58,6 +58,15 @@ public class RCTCamera {
         }
     }
 
+    public boolean hasCameraInstanceOfType(int type) {
+        if (null != _cameras.get(type)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     public int getPreviewWidth(int type) {
         CameraInfoWrapper cameraInfo = _cameraInfos.get(type);
         if (null == cameraInfo) {

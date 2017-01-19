@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class RCTCameraViewManager extends ViewGroupManager<RCTCameraView> {
     private static final String REACT_CLASS = "RCTCamera";
+    private RCTCameraView currentView;
 
     @Override
     public String getName() {
@@ -19,7 +20,20 @@ public class RCTCameraViewManager extends ViewGroupManager<RCTCameraView> {
 
     @Override
     public RCTCameraView createViewInstance(ThemedReactContext context) {
-        return new RCTCameraView(context);
+
+        // If there's a current CCCameraView already instantiated, remove its lifecycleListener from the context
+        if (currentView != null && currentView.lifecycleListener != null) {
+            context.removeLifecycleEventListener(currentView.lifecycleListener);
+        }
+
+        currentView = new RCTCameraView(context);
+
+        // After instantiating a new view, add its liefcycleListener to the context
+        if (currentView != null && currentView.lifecycleListener != null) {
+            context.addLifecycleEventListener(currentView.lifecycleListener);
+        }
+
+        return currentView;
     }
 
     @ReactProp(name = "aspect")
