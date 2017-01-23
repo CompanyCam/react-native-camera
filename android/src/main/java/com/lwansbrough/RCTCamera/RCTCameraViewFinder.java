@@ -60,6 +60,7 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         _surfaceTexture = null;
+        this.setSurfaceTextureListener(null);
         stopCamera();
         return true;
     }
@@ -103,6 +104,9 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
     public void startPreview() {
         if (_surfaceTexture != null) {
             startCamera();
+        }
+        else {
+            this.setSurfaceTextureListener(this);
         }
     }
 
