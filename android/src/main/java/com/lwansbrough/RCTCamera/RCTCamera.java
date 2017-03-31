@@ -367,30 +367,35 @@ public class RCTCamera {
         // TODO: take in account the _orientation prop
 
         setAdjustedDeviceOrientation(rotation);
-        camera.setDisplayOrientation(displayRotation);
-
-        Camera.Parameters parameters = camera.getParameters();
-        parameters.setRotation(cameraInfo.rotation);
-
-        // set preview size
-        // defaults to highest resolution available
-        Camera.Size optimalPreviewSize = getBestSize(parameters.getSupportedPreviewSizes(), Integer.MAX_VALUE, Integer.MAX_VALUE);
-        int width = optimalPreviewSize.width;
-        int height = optimalPreviewSize.height;
-
-        parameters.setPreviewSize(width, height);
         try {
-            camera.setParameters(parameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        if (cameraInfo.rotation == 0 || cameraInfo.rotation == 180) {
-            cameraInfo.previewWidth = width;
-            cameraInfo.previewHeight = height;
-        } else {
-            cameraInfo.previewWidth = height;
-            cameraInfo.previewHeight = width;
+            // Check that the displayRotation value is valid before trying to set the display orientation
+            System.err.println("Trying to set a displayRotation of " + displayRotation + " in adjustPreviewLayout().");
+            if (displayRotation == 0 || displayRotation == 90 || displayRotation == 180 || displayRotation == 270) {
+                camera.setDisplayOrientation(displayRotation);
+            }
+            Camera.Parameters parameters = camera.getParameters();
+            parameters.setRotation(cameraInfo.rotation);
+
+            // set preview size
+            // defaults to highest resolution available
+            Camera.Size optimalPreviewSize = getBestSize(parameters.getSupportedPreviewSizes(), Integer.MAX_VALUE, Integer.MAX_VALUE);
+            int width = optimalPreviewSize.width;
+            int height = optimalPreviewSize.height;
+
+            parameters.setPreviewSize(width, height);
+            camera.setParameters(parameters);
+
+            if (cameraInfo.rotation == 0 || cameraInfo.rotation == 180) {
+                cameraInfo.previewWidth = width;
+                cameraInfo.previewHeight = height;
+            } else {
+                cameraInfo.previewWidth = height;
+                cameraInfo.previewHeight = width;
+            }
+        } catch (Exception e) {
+            System.err.println("Caught an exception trying to set camera parameters in adjustPreviewLayout().");
+            e.printStackTrace();
         }
     }
 
