@@ -347,8 +347,11 @@ public class RCTCamera {
     }
 
     public void adjustPreviewLayout(int type) {
+
+        System.err.println("adjustPreviewLayout() is called.");
         Camera camera = _cameras.get(type);
         if (null == camera) {
+            System.err.println("The camera was null in adjustPreviewLayout().");
             return;
         }
 
