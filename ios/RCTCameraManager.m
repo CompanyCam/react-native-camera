@@ -1,9 +1,9 @@
 #import "RCTCameraManager.h"
 #import "RCTCamera.h"
-#import "RCTBridge.h"
-#import "RCTEventDispatcher.h"
-#import "RCTUtils.h"
-#import "RCTLog.h"
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTUtils.h>
+#import <React/RCTLog.h>
 #import "UIView+React.h"
 #import "NSMutableDictionary+ImageMetadata.m"
 #import <AssetsLibrary/ALAssetsLibrary.h>
