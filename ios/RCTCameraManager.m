@@ -4,7 +4,7 @@
 #import <React/RCTEventDispatcher.h>
 #import <React/RCTUtils.h>
 #import <React/RCTLog.h>
-#import "UIView+React.h"
+#import <React/UIView+React.h>
 #import "NSMutableDictionary+ImageMetadata.m"
 #import <AssetsLibrary/ALAssetsLibrary.h>
 #import <AVFoundation/AVFoundation.h>
