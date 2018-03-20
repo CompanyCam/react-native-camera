@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   DeviceEventEmitter, // android
   NativeAppEventEmitter, // ios
@@ -178,7 +179,7 @@ export default class Camera extends Component {
     if (onBarCodeRead) {
       this.cameraBarCodeReadListener = Platform.select({
         ios: NativeAppEventEmitter.addListener('CameraBarCodeRead', this._onBarCodeRead),
-        android: DeviceEventEmitter.addListener('CameraBarCodeReadAndroid',  this._onBarCodeRead)
+        android: DeviceEventEmitter.addListener('CameraBarCodeReadAndroid', this._onBarCodeRead)
       })
     }
   }
@@ -204,10 +205,10 @@ export default class Camera extends Component {
 
   forceRelease() {
     var logstr = "[RCTCamera JS] Attempted to force Camera release: ";
-    if(CameraManager.forceRelease){
+    if (CameraManager.forceRelease) {
       CameraManager.forceRelease();
       logstr += "Success!";
-    }else{
+    } else {
       logstr += "Failed, forceRelease is undefined";
     }
     console.log(logstr);
